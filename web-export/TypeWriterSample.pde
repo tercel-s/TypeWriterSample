@@ -17,11 +17,12 @@ void draw() {
 ArrayList<String> lines = new ArrayList<String>();
 abstract class TypeWriter {
   
-  final int MAX_LINES = 5;  
-  final int FONT_SIZE = 12;
+  final int MAX_LINES = 15;
+  final int FONT_SIZE = 10;
   final int WAIT_TIME = 12;
   final int START_X = 10;
   final int START_Y = 10 + FONT_SIZE;
+  final color FONT_COLOR = 0xFF00CC10;
   
   int endPosition;
   
@@ -47,7 +48,10 @@ abstract class TypeWriter {
   TypeWriter update() {
     pushMatrix();
     camera();
-    fill(100);
+    textSize(FONT_SIZE);
+    textFont(createFont("monospace", FONT_SIZE));
+    fill(FONT_COLOR);
+    
     
     // サブクラスの具象メソッドに委譲
     TypeWriter ret = display();
@@ -123,6 +127,17 @@ class Elevator extends TypeWriter {
   
   protected TypeWriter display() {
     int textLength = ++_endPosition - lines.get(0).length();
+    
+    // 1行目がなめらかに消えるように、
+    // 縦方向に縮小するアニメーションを行う。
+    pushMatrix();
+    translate(0,  FONT_SIZE * 0.5);
+    scale(1.0, 1.0 - ++_counter / (float)FONT_SIZE, 1.0);
+    translate(0, - FONT_SIZE * 0.5);
+    text(lines.get(0), START_X, START_Y);    
+    popMatrix();
+    
+    // 2行目以降の表示
     for(int i = 1; i < min(MAX_LINES, lines.size()); ++i) {
       String line = lines.get(i);
       textLength -= line.length();
@@ -149,6 +164,29 @@ class Elevator extends TypeWriter {
 
 
 void setupTypeWriter() {
+  typeWriter.addLine("/* --------------------------------------------------");
+  typeWriter.addLine("");
+  typeWriter.addLine("+-----             |      |");
+  typeWriter.addLine("|     |         -  |      |");
+  typeWriter.addLine("+-----   |   |     |   ---+");
+  typeWriter.addLine("|     |  |   |  |  |  |   |");
+  typeWriter.addLine("+-----    ---+  |  |   ---+");
+  typeWriter.addLine("");
+  typeWriter.addLine("         -    |    |");
+  typeWriter.addLine("|  |  |     --+--  |---");
+  typeWriter.addLine("|  |  |  |    |    |   |");
+  typeWriter.addLine(" -- --   |    \\--  |   |");
+  typeWriter.addLine("");
+  typeWriter.addLine("+----- ");
+  typeWriter.addLine("|     |                                     -");
+  typeWriter.addLine("+-----   ---  ---   --- +---+  ----  ----   +---   ---+");
+  typeWriter.addLine("|       |    |   | |    +---+ +---+ +---+ | |   | |   |");
+  typeWriter.addLine("|       |     ---   --- +---- ----  ----  | |   |  ---+");
+  typeWriter.addLine("                                                      |");
+  typeWriter.addLine("                                                   ---");
+  typeWriter.addLine("");
+  typeWriter.addLine("-------------------------------------------------- */");
+
   typeWriter.addLine("TypeWriter typeWriter;");
   typeWriter.addLine("void setup() {");
   typeWriter.addLine("  size(400, 300, P3D);");
